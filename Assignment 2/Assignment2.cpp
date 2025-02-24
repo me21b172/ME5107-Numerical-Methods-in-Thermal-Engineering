@@ -1,21 +1,21 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-double Q1(double n, double n_1) {
+long double Q1(long double n, long double n_1) {
     return 3.0 * n_1 - 2.0 * n;
 }
 
-double f(double x) {
-    return sin(x);
+long double f(long double x) {
+    return sin(5.0 * x);
 }
 
-double X(double x, double n) {
+long double X(long double x, long double n) {
     return (3.0 * x) / n;
 }
 
-vector<vector<double>> create_matrix_A(vector<vector<double>> &L, vector<vector<double>> &U) {
+vector<vector<long double>> create_matrix_A(vector<vector<long double>> &L, vector<vector<long double>> &U) {
     int n = L.size();
-    vector<vector<double>> A(n, vector<double>(n, 0));
+    vector<vector<long double>> A(n, vector<long double>(n, 0));
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
             for (int k = 0; k < i; k++) {
@@ -26,13 +26,13 @@ vector<vector<double>> create_matrix_A(vector<vector<double>> &L, vector<vector<
     return A;
 }
 
-vector<vector<double>> create_matrix(double n) {
+vector<vector<long double>> create_matrix(long double n) {
     int m = (int)n;
-    vector<vector<double>> A(m, vector<double>(m, 0));
+    vector<vector<long double>> A(m, vector<long double>(m, 0));
     A[0][0] = 1.0;
     A[0][1] = 2.0;
     A[m - 1][m - 1] = 1.0;
-    A[m - 1][m - 2] = 4.0;
+    A[m - 1][m - 2] = 2.0;
     for (int i = 1; i < m - 1; i++) {
         A[i][i - 1] = 1.0;
         A[i][i] = 4.0;
@@ -41,42 +41,42 @@ vector<vector<double>> create_matrix(double n) {
     return A;
 }
 
-vector<double> create_b(double n) {
+vector<long double> create_b(long double n) {
     int m = (int)n;
-    vector<double> b(m, 0.0);
-    b[0] = (n / 3.0) * ((-5.0 / 2.0) * f(X(0.0, n)) + (1.0 / 2.0) * f(X(2.0, n)));
-    b[m - 1] = (n / 3.0) * ((-5.0 / 2.0) * f(X(n, n)) + (1.0 / 2.0) * f(X(n - 2.0, n)));
+    vector<long double> b(m, 0.0);
+    b[0] = (n / 3.0) * ((-5.0 / 2.0) * f(X(0.0, n)) + 2.0 * f(X(1.0,n)) + (1.0 / 2.0) * f(X(2.0, n)));
+    b[m - 1] = (n / 3.0) * ((5.0 / 2.0) * f(X(n, n)) - 2.0 * f(X(1.0,n)) - (1.0 / 2.0) * f(X(n - 2.0, n)));
     for (int t = 1; t < m - 1; t++) {
-        double x = X(t, n);
+        long double x = X(t, n);
         b[t] = n * (f(X(t + 1.0, n)) - f(X(t - 1.0, n)));
     }
     return b;
 }
 
-void doLittle(vector<vector<double>> &A, vector<vector<double>> &L, vector<vector<double>> &U, int ind) {
+void doLittle(vector<vector<long double>> &A, vector<vector<long double>> &L, vector<vector<long double>> &U, int ind) {
     int n = A.size();
     L[ind][ind] = 1.0;
-    for (int t = ind; t < n; t++) {
-        double ans = 0.0;
+    for (int i = ind; i < n; i++) {
+        long double ans = 0.0;
         for (int j = 0; j < ind; j++) {
-            ans += L[ind][j] * U[j][t];
+            ans += L[ind][j] * U[j][i];
         }
-        U[ind][t] = (A[ind][t] - ans) / L[ind][ind];
+        U[ind][i] = (A[ind][i] - ans) / L[ind][ind];
     }
-    for (int t = ind + 1; t < n; t++) {
-        double ans = 0.0;
+    for (int i = ind + 1; i < n; i++) {
+        long double ans = 0.0;
         for (int j = 0; j < ind; j++) {
-            ans += L[t][j] * U[j][ind];
+            ans += L[i][j] * U[j][ind];
         }
-        L[t][ind] = (A[t][ind] - ans) / U[ind][ind];
+        L[i][ind] = (A[i][ind] - ans) / U[ind][ind];
     }
 }
 
-vector<double> forward_substitution(vector<vector<double>> &A, vector<double> &b) {
+vector<long double> forward_substitution(vector<vector<long double>> &A, vector<long double> &b) {
     int n = A.size();
-    vector<double> x(n, 0.0);
+    vector<long double> x(n, 0.0);
     for (int i = 0; i < n; i++) {
-        double ans = 0.0;
+        long double ans = 0.0;
         for (int j = 0; j < i; j++) {
             ans += A[i][j] * x[j];
         }
@@ -85,11 +85,11 @@ vector<double> forward_substitution(vector<vector<double>> &A, vector<double> &b
     return x;
 }
 
-vector<double> backward_substitution(vector<vector<double>> &A, vector<double> &b) {
+vector<long double> backward_substitution(vector<vector<long double>> &A, vector<long double> &b) {
     int n = A.size();
-    vector<double> x(n, 0.0);
+    vector<long double> x(n, 0.0);
     for (int i = n - 1; i >= 0; i--) {
-        double ans = 0.0;
+        long double ans = 0.0;
         for (int j = i + 1; j < n; j++) {
             ans += A[i][j] * x[j];
         }
@@ -98,10 +98,10 @@ vector<double> backward_substitution(vector<vector<double>> &A, vector<double> &
     return x;
 }
 
-vector<double> LUDecomposition(vector<vector<double>> &A, vector<double> &b) {
+vector<long double> LUDecomposition(vector<vector<long double>> &A, vector<long double> &b) {
     int m = A.size();
     
-    vector<vector<double>> L(m, vector<double>(m, 0)), U(m, vector<double>(m, 0));
+    vector<vector<long double>> L(m, vector<long double>(m, 0.0)), U(m, vector<long double>(m, 0.0));
     
     for (int i = 0; i < m; i++) {
         doLittle(A, L, U, i);
@@ -123,20 +123,20 @@ vector<double> LUDecomposition(vector<vector<double>> &A, vector<double> &b) {
         cout << endl;
     }
 
-    vector<double> x = forward_substitution(L, b);
+    vector<long double> x = forward_substitution(L, b);
     
-    vector<double> y = backward_substitution(U, x);
+    vector<long double> y = backward_substitution(U, x);
 
     return y;
 }
 
-vector<double> Thomas_algorithm(vector<vector<double>> &A, vector<double> &b) {
+vector<long double> Thomas_algorithm(vector<vector<long double>> &A, vector<long double> &b) {
     int n = A.size();
-    vector<double> x(n, 0.0);
+    vector<long double> x(n, 0.0);
 
     // Forward elimination
     for (int i = 1; i < n; i++) {
-        double factor = A[i][i - 1] / A[i - 1][i - 1];
+        long double factor = A[i][i - 1] / A[i - 1][i - 1];
         A[i][i] -= factor * A[i - 1][i];
         b[i] -= factor * b[i - 1];
         A[i][i - 1] = 0.0; // Set lower diagonal to zero
@@ -152,10 +152,10 @@ vector<double> Thomas_algorithm(vector<vector<double>> &A, vector<double> &b) {
 }
 
 int main() {
-    double n = 65.0, constant = 2.9689;
+    long double n = 65.0, constant = 2.9689;
 
     // Example initialization for Q1 and c
-    vector<double> a(65, constant);
+    vector<long double> a(65, constant);
     for (int i = 2; i < a.size(); i++) {
         a[i] = Q1(a[i - 2], a[i - 1]);
     }
@@ -174,9 +174,9 @@ int main() {
     cout << "c[n-1]: " << c[c.size() - 1] << endl;
 
     // Matrix and vector creation
-    n = 3.0;
-    vector<vector<double>> A = create_matrix(n);
-    vector<double> b = create_b(n);
+    n = 4.0;
+    vector<vector<long double>> A = create_matrix(n);
+    vector<long double> b = create_b(n);
 
     // Print matrix A
     cout << "Matrix A:\n";
@@ -195,7 +195,7 @@ int main() {
     cout << endl;
 
     // Solve using LU Decomposition
-    vector<double> x_lu = LUDecomposition(A, b);
+    vector<long double> x_lu = LUDecomposition(A, b);
     
     cout << "Solution using LU Decomposition:\n";
     for (int i = 0; i < n; i++) {
@@ -204,7 +204,7 @@ int main() {
     cout << endl;
 
     // Solve using Thomas Algorithm
-    vector<double> x_thomas = Thomas_algorithm(A, b);
+    vector<long double> x_thomas = Thomas_algorithm(A, b);
     
     cout << "Solution using Thomas Algorithm:\n";
     for (int i = 0; i < n; i++) {
